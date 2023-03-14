@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -23,6 +24,9 @@ class MainActivity : AppCompatActivity() {
         val pauseBtn = findViewById<FloatingActionButton>(R.id.fabPause)
         val playBtn = findViewById<FloatingActionButton>(R.id.fabPlay)
         val stopBtn = findViewById<FloatingActionButton>(R.id.fabStop)
+        val swapBtn = findViewById<FloatingActionButton>(R.id.fabSwap)
+        var mode: String = "cheer"
+        val img = findViewById<ImageView>(R.id.ivPng)
 
         pauseBtn.setOnClickListener {
             mediaPlayer?.pause()
@@ -30,7 +34,12 @@ class MainActivity : AppCompatActivity() {
 
         playBtn.setOnClickListener {
             if (mediaPlayer == null) {
-                mediaPlayer = MediaPlayer.create(this, R.raw.cheer)
+
+                mediaPlayer = if (mode == "cheer") {
+                    MediaPlayer.create(this, R.raw.cheer)
+                } else {
+                    MediaPlayer.create(this, R.raw.war)
+                }
                 initSeekBar()
             }
 
@@ -38,13 +47,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         stopBtn.setOnClickListener {
-            mediaPlayer?.stop()
-            mediaPlayer?.reset()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            handler.removeCallbacks(runnable)
-            seekBar.progress = 0
+            stopMediaPlayer()
         }
+
+        swapBtn.setOnClickListener {
+            stopMediaPlayer()
+
+            mode = if (mode == "cheer") {
+                img.setImageResource(R.drawable.war)
+                "war"
+            } else {
+                img.setImageResource(R.drawable.cheer)
+                "cheer"
+            }
+        }
+    }
+
+    private fun stopMediaPlayer() {
+        mediaPlayer?.stop()
+        mediaPlayer?.reset()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        handler.removeCallbacks(runnable)
+        seekBar.progress = 0
     }
 
     private fun initSeekBar() {
